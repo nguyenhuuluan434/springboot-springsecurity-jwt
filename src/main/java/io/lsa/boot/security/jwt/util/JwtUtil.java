@@ -3,6 +3,8 @@ package io.lsa.boot.security.jwt.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +18,16 @@ public class JwtUtil {
 
     //this key need to store in vault/db/env
     private String SECRET_KEY = "secret";
+    private static final Logger logger = LogManager.getLogger(JwtUtil.class);
 
     public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
+        try {
+            return extractClaim(token, Claims::getSubject);
+        }catch (Throwable t){
+            logger.error("",t);
+            return null;
+        }
+
     }
 
     public Date extractExpiration(String token) {
@@ -31,7 +40,12 @@ public class JwtUtil {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        try {
+            return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        }catch (Throwable t){
+            logger.error("",t);
+            return null;
+        }
     }
 
     private boolean isTokenExpired(String token) {

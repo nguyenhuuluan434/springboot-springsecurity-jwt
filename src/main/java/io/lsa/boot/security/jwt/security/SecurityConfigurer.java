@@ -25,6 +25,9 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Autowired
     private JwtFilter jwtFilter;
 
+    @Autowired
+    private LoggerFilter loggerFilter;
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(myUserDetailService);
@@ -49,15 +52,16 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests().antMatchers(HttpMethod.POST,"authentication").permitAll()
-        .and()
-        .authorizeRequests().anyRequest().authenticated()
-        .and()
-        .exceptionHandling()
-        .and().sessionManagement()
-        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .authorizeRequests().antMatchers(HttpMethod.POST, "authentication").permitAll()
+                .and()
+                .authorizeRequests().anyRequest().authenticated()
+                .and()
+                .exceptionHandling()
+                .and().sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
         ;
-        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class).addFilterBefore(loggerFilter, JwtFilter.class);
     }
 
     @Bean
