@@ -34,7 +34,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
         logger.info(RequestCorrelation.getRequestId());
         final String uri = httpServletRequest.getRequestURI();
-        if ("/authentication".equals(uri)) {
+        if ("/authentication".equals(uri) || "/post".equals(uri)) {
             filterChain.doFilter(httpServletRequest, httpServletResponse);
             return;
         }

@@ -46,15 +46,21 @@ public class SecurityConfigurer extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers(HttpMethod.POST, "/authentication");
+        web.ignoring().antMatchers(HttpMethod.POST, "/authentication**")
+                .and().ignoring().antMatchers(HttpMethod.POST,"/post**");
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.csrf().disable()
-                .authorizeRequests().antMatchers(HttpMethod.POST, "authentication").permitAll()
+        http.csrf().disable().authorizeRequests().regexMatchers("/authentication").permitAll().and()
+                .authorizeRequests().regexMatchers("/post").permitAll()
                 .and()
-                .authorizeRequests().anyRequest().authenticated()
+                .authorizeRequests().antMatchers(HttpMethod.POST, "/post**").permitAll()
+                .and()
+                .authorizeRequests().antMatchers(HttpMethod.POST, "/authentication**").permitAll()
+                .and()
+                .authorizeRequests().anyRequest().permitAll()
+                //.authenticated()
                 .and()
                 .exceptionHandling()
                 .and().sessionManagement()
